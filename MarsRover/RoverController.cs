@@ -32,7 +32,7 @@ namespace MarsRover
 
         private void ParseBounds(string boundsLine)
         {
-            if (!IsValidCoord(boundsLine))
+            if (!IsValidCoord(boundsLine)) // verify the plateau bounds are in the valid format
             {
                 throw new InvalidDataException("Invalid plateau bounds given");
             }
@@ -47,7 +47,7 @@ namespace MarsRover
             for (int i = 1; i < instructions.Length; i+=2)
             {
                 var startPosLine = instructions[i];
-                if (!IsValidPosition(startPosLine))
+                if (!IsValidPosition(startPosLine)) // verify the start position is in the valid format
                 {
                     output.AppendLine($"Warning: Invalid start position for Rover #{i / 2}. Sipping rover commands.");
                     continue;
@@ -55,8 +55,22 @@ namespace MarsRover
 
                 var startPos = instructions[i].Split(' ');
                 Rover rover = new Rover(int.Parse(startPos[0]), int.Parse(startPos[1]), startPos[2]);
+
+                if (!IsInBounds(rover.Position)) // verify that the given start position is in bounds of the plateau
+                {
+                    output.AppendLine($"Warning: Invalid start position for Rover #{i / 2}. Sipping rover commands.");
+                    continue;
+                }
+
+                var commands = instructions[i + 1];
+
+                if (!IsValidCommands(commands)) // verify that the commands are in the valid format
+                {
+                    output.AppendLine($"Warning: Invalid commands for Rover #{i / 2}. Sipping rover commands.");
+                    continue;
+                }
                 
-                foreach(var command in instructions[i + 1])
+                foreach(var command in commands)
                 {
                     switch (command)
                     {
